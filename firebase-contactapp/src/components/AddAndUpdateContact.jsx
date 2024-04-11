@@ -1,15 +1,26 @@
 import React from 'react'
 import Modal from './Modal'
 import {Field,Form,Formik} from 'formik'
-import { collection,addDoc } from 'firebase/firestore';
+import { collection,addDoc,doc,updateDoc } from 'firebase/firestore';
 import {db} from '../config/firebase'
 
-const AddAndUpdateContact = ({isOpen,onClose,isUpdate}) => {
+const AddAndUpdateContact = ({isOpen,onClose,isUpdate,contact}) => {
 
     const addContact = async (contact)=>{
         try {
             const contactRef = collection(db,"contacts")
             await addDoc(contactRef,contact)
+            onClose()
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const updateContact = async (contact,id)=>{
+        try {
+            const contactRef = doc(db,"contacts",id)
+            await updateDoc(contactRef,contact)
+            onClose()
         } catch (error) {
             console.log(error)
         }
@@ -19,12 +30,16 @@ const AddAndUpdateContact = ({isOpen,onClose,isUpdate}) => {
     <div>
     <Modal isOpen={isOpen} onClose={onClose}>
         <Formik
-        initialValues={{
+        initialValues={isUpdate ?
+            {
+                name:contact.name,
+                email:contact.email,
+            } :{
             name:"",
             email:"",
         }}
         onSubmit={(values)=>{
-            console.log(values)
+            isUpdate ? updateContact(values,contact.id) :
             addContact(values)
         }}
         >

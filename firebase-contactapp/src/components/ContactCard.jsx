@@ -5,7 +5,6 @@ import {RiEditCircleLine} from 'react-icons/ri'
 import {db} from '../config/firebase'
 import { deleteDoc ,doc } from 'firebase/firestore';
 import AddAndUpdateContact from './AddAndUpdateContact';
-import { useState } from 'react'
 import useDisclouse from '../hooks/useDisclouse'
 
 const ContactCard = ({contact}) => {
@@ -35,7 +34,7 @@ const ContactCard = ({contact}) => {
                 <IoMdTrash onClick={()=>deleteContact(contact.id)} className='text-orange cursor-pointer'/>
               </div>
     </div>
-    <AddAndUpdateContact isUpdate isOpen={isOpen} onClose={onClose}/>
+    <AddAndUpdateContact contact={contact} isUpdate isOpen={isOpen} onClose={onClose}/>
     </>
   )
 }

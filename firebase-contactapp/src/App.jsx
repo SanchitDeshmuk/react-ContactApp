@@ -1,17 +1,11 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import Navbar from './components/Navbar'
 import { IoSearch } from "react-icons/io5";
 import { FaCirclePlus } from "react-icons/fa6";
-import {collection,getDocs} from 'firebase/firestore'
+import {collection,onSnapshot} from 'firebase/firestore'
 import {db} from './config/firebase'
-import {HiOutlineUserCircle} from 'react-icons/hi'
-import {IoMdTrash} from 'react-icons/io'
-import {RiEditCircleLine} from 'react-icons/ri'
 import ContactCard from './components/ContactCard'
-import Modal from './components/Modal';
 import AddAndUpdateContact from './components/AddAndUpdateContact';
 import useDisclouse from './hooks/useDisclouse'
 
@@ -22,16 +16,17 @@ function App() {
   useEffect(()=>{
     const getContacts = async () =>{
       try {
-
         const contactsRef = collection(db,"contacts")
-        const contactsSnapshot = await getDocs(contactsRef)
-        const contactLists = contactsSnapshot.docs.map((doc)=>{
-          return{
-            id:doc.id,
-            ...doc.data(),
-          }
+        onSnapshot(contactsRef,(snapshot)=>{
+          const contactLists = snapshot.docs.map((doc)=>{
+            return{
+              id:doc.id,
+              ...doc.data(),
+            }
+          })
+          setContacts(contactLists)
+          return contactLists
         })
-        setContacts(contactLists)
       } catch (error) {
         console.log(error)
       }
