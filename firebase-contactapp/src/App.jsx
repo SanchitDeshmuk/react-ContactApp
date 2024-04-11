@@ -8,6 +8,8 @@ import {db} from './config/firebase'
 import ContactCard from './components/ContactCard'
 import AddAndUpdateContact from './components/AddAndUpdateContact';
 import useDisclouse from './hooks/useDisclouse'
+import { ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const[contacts,setContacts] = useState([])
@@ -34,6 +36,26 @@ function App() {
     getContacts();
   },[])
 
+  const filterContacts = (e)=>{
+    const value = e.target.value
+
+    const contactsRef = collection(db,"contacts")
+        onSnapshot(contactsRef,(snapshot)=>{
+          const contactLists = snapshot.docs.map((doc)=>{
+            return{
+              id:doc.id,
+              ...doc.data(),
+            }
+          })
+
+          const filteredContacts = contactLists.filter(contact =>contact.name.toLowerCase().includes(value.toLowerCase()))
+
+          setContacts(filteredContacts)
+
+          return filteredContacts
+        })
+  }
+
   return (
     <>
     <div className='max-w-[370px] mx-auto px-4'>
@@ -41,7 +63,7 @@ function App() {
       <div className='flex gap-2'>
       <div className='relatice flex items-center flex-grow'>
       <IoSearch className='ml-1 absolute text-white text-3xl'/>
-        <input type="text" className='pl-10 text-white flex-grow rounded-md border h-10 border-white bg-transparent' />
+        <input onChange={filterContacts} type="text" className='pl-10 text-white flex-grow rounded-md border h-10 border-white bg-transparent' />
       </div>
       <div>
       <FaCirclePlus onClick={onOpen} className='text-5xl text-white cursor-pointer'/>
@@ -56,6 +78,7 @@ function App() {
       </div>
     </div>
     <AddAndUpdateContact isOpen={isOpen} onClose={onClose}/>
+    <ToastContainer />
     </>
   )
 }
